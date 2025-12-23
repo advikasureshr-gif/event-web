@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIT Events</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://www.campusoption.com/images/colleges/gallery/24_07_17_012336_College.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: rgba(51, 51, 51, 0.8);
+            color: white;
+            text-align: center;
+            padding: 1em;
+        }
+        .nav {
+            background: rgba(68, 68, 68, 0.8);
+            padding: 0.5em;
+            text-align: center;
+        }
+        .nav a {
+            color: white;
+            margin: 0 15px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .container {
+            display: flex;
+            padding: 20px;
+            flex: 1;
+        }
+        .sidebar {
+            width: 25%;
+            background: rgba(244, 244, 244, 0.8);
+            padding: 15px;
+            color: black;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            padding: 10px;
+            background: #ddd;
+            margin: 5px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .sidebar ul li:hover {
+            background: #bbb;
+        }
+        .content {
+            width: 75%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.6);
+        }
+        .footer {
+            background: rgba(51, 51, 51, 0.8);
+            color: white;
+            text-align: center;
+            padding: 1em;
+            width: 100%;
+            margin-top: auto;
+        }
+        #eventDetails {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            color: black;
+            border-radius: 5px;
+            display: none;
+        }
+        .event-gallery img {
+            max-width: 500px;
+            max-height: 300px;
+            width: auto;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+        }
+        .countdown {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .event-registration-form {
+            margin-top: 20px;
+            display: none;
+        }
+        .event-registration-form input {
+            margin: 5px 0;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .event-registration-form button {
+            padding: 10px 20px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .event-registration-form button:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>VIT EVENTS</h1>
+    </div>
+    <div class="nav">
+        <a onclick="showInfo('home')">Home</a>
+        <a onclick="showInfo('about')">About</a>
+        <a onclick="showInfo('services')">Services</a>
+        <a onclick="showInfo('contact')">Contact</a>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Event Dashboard</h2>
+            <input type="text" id="searchEvent" placeholder="Search Event..." onkeyup="searchEvent()">
+            <select id="categoryFilter" onchange="filterEvents()">
+                <option value="all">All Categories</option>
+                <option value="cultural">Cultural</option>
+                <option value="technical">Technical</option>
+                <option value="sports">Sports</option>
+            </select>
+            <ul id="eventList">
+                <li data-category="cultural" onclick="displayEventDetails('Vibrance')">Vibrance</li>
+                <li data-category="technical" onclick="displayEventDetails('Conference')">Conference</li>
+                <li data-category="technical" onclick="displayEventDetails('Workshop')">Workshop</li>
+                <li data-category="technical" onclick="displayEventDetails('Webinar')">Webinar</li>
+                <li data-category="sports" onclick="displayEventDetails('Cricket Tournament')">Cricket Tournament</li>
+                <li data-category="sports" onclick="displayEventDetails('Football Tournament')">Football Tournament</li>
+                <li data-category="sports" onclick="displayEventDetails('Basketball Championship')">Basketball Championship</li>
+                <li data-category="sports" onclick="displayEventDetails('Badminton League')">Badminton League</li>
+                <li data-category="cultural" onclick="displayEventDetails('Dance Competition')">Dance Competition</li>
+                <li data-category="technical" onclick="displayEventDetails('Devshouse Hackathon')">Devshouse Hackathon</li>
+            </ul>
+        </div>
+        <div class="content">
+            <!-- Dynamic content section -->
+            <div id="dynamicContent">
+                <h2>Welcome to VIT College</h2>
+                <p>Explore events and stay updated with the latest happenings.</p>
+            </div>
+            
+            <!-- Persistent elements -->
+            <div id="eventDetails"></div>
+            <div class="countdown" id="countdown"></div>
+            <!-- Event-specific registration form -->
+            <div class="event-registration-form" id="eventRegistrationForm">
+                <h3>Register for <span id="eventName"></span></h3>
+                <input type="text" id="name" placeholder="Your Name">
+                <input type="email" id="email" placeholder="Your Email">
+                <button onclick="registerForEvent()">Register</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 VIT College Events</p>
+    </div>
+
+    <script>
+        // Event details including date, time, and gallery images
+        const eventDetailsData = {
+            "Vibrance": {
+                details: "🎉 <b>Vibrance</b><br>Date: Feb 26 - Mar 1, 2026<br>Time: 9 AM - 10 PM<br>Description: A festival of events and a DJ concert.",
+                images: ["https://www.livechennai.com/businesslistings/News_photo/Vibrance-2024-060324.jpg"],
+                date: "2026-04-26T09:00:00" // Future date
+            },
+            "Conference": {
+                details: "📢 <b>Conference</b><br>Date: Mar 15, 2025<br>Time: 10 AM - 12:50 PM<br>Description: A conference on emerging technologies.",
+                images: ["https://s3.amazonaws.com/thumbnails.venngage.com/template/6398aff8-5aed-48f6-b412-fde8734ab692.png"],
+                date: "2025-03-15T10:00:00" // Future date
+            },
+            "Workshop": {
+                details: "🛠️ <b>Workshop</b><br>Date: Apr 5, 2025<br>Time: 2 PM - 6 PM<br>Description: Hands-on workshop on AI & Machine Learning.",
+                images: ["https://tse1.mm.bing.net/th?id=OIP.MO8dh4MA3rRmDWHt36SAbAHaKe&pid=Api&P=0&h=220"],
+                date: "2025-04-05T14:00:00" // Future date
+            },
+            "Webinar": {
+                details: "💻 <b>Webinar</b><br>Date: May 10, 2025<br>Time: 5 PM - 7 PM<br>Description: An online webinar on cybersecurity trends.",
+                images: ["https://edu.ieee.org/in-spsu/wp-content/uploads/sites/289/cybersecurity_poster-1.png"],
+                date: "2026-05-10T17:00:00" // Future date
+            },
+            "Cricket Tournament": {
+                details: "🏏 <b>Cricket Tournament</b><br>Date: Mar 20, 2025<br>Time: 8 AM - 6 PM<br>Description: Inter-college cricket tournament.",
+                images: ["https://i.pinimg.com/originals/b7/61/aa/b761aaa0e2090cc0c69370704dae1f8e.jpg"],
+                date: "2026-09-20T08:00:00" // Future date
+            },
+            "Football Tournament": {
+                details: "⚽ <b>Football Tournament</b><br>Date: Mar 25, 2025<br>Time: 9 AM - 5 PM<br>Description: Inter-college football tournament.",
+                images: ["https://d1csarkz8obe9u.cloudfront.net/posterpreviews/football-soccer-tournament-flyer-poster-design-template-ccaad7362e42e95b13d94ddfcfcf8bc8_screen.jpg?ts=1664286537"],
+                date: "2025-03-25T09:00:00" // Future date
+            },
+            "Basketball Championship": {
+                details: "🏀 <b>Basketball Championship</b><br>Date: Apr 1, 2025<br>Time: 10 AM - 6 PM<br>Description: Inter-college basketball championship.",
+                images: ["https://img.freepik.com/premium-vector/basketball-hoop-ball-sport-flyer-poster-design-basketball-tournament-flyer-vector_647434-289.jpg?w=2000"],
+                date: "2025-04-01T10:00:00" // Future date
+            },
+            "Badminton League": {
+                details: "🏸 <b>Badminton League</b><br>Date: Apr 8, 2025<br>Time: 9 AM - 5 PM<br>Description: Inter-college badminton league.",
+                images: ["https://c8.alamy.com/comp/2C36K7C/badminton-tournament-poster-template-side-view-of-a-player-jumping-high-to-smash-shuttlecock-in-flat-style-2C36K7C.jpg"],
+                date: "2026-04-07T09:00:00" // Future date
+            },
+            "Dance Competition": {
+                details: "💃 <b>Dance Competition</b><br>Date: Apr 10, 2025<br>Time: 5 PM - 9 PM<br>Description: A cultural dance competition.",
+                images: ["https://d1csarkz8obe9u.cloudfront.net/posterpreviews/dance-competition-poster-design-template-50d8d89ec87e19066f267572c3df2c13_screen.jpg?ts=1678676455"],
+                date: "2025-04-10T17:00:00" // Future date
+            },
+            "Devshouse Hackathon": {
+                details: "👨‍💻 <b>Devshouse Hackathon</b><br>Date: Apr 4-6, 2025<br>Time: 10 AM - 10 PM<br>Description: A 48-hour coding challenge.",
+                images: ["https://devshouse25.devfolio.co/_next/image?url=https%3A%2F%2Fassets.devfolio.co%2Fhackathons%2Fd81384643a714d51877c89601cae35e3%2Fassets%2Fcover%2F654.png&w=1440&q=100"],
+                date: "2026-04-04T10:00:00" // Future date
+            }
+        };
+
+        // Variable to store the interval ID for the countdown
+        let countdownInterval;
+
+        // Display section details dynamically
+        function showInfo(section) {
+            const infoContent = {
+                "home": "<h2>Home</h2><p>Welcome to VIT Events, where you can find the latest happenings and activities.</p>",
+                "about": "<h2>About Us</h2><p>VIT Events is dedicated to organizing and managing various events for students.</p>",
+                "services": "<h2>Our Services</h2><ul><li>Event Planning</li><li>Student Support</li><li>Workshops & Seminars</li></ul>",
+                "contact": "<h2>Contact Us</h2><p>Email: admin@vit.ac.in<br>Phone: 044 3993 1555</p>"
+            };
+            
+            // Only update the dynamic content area
+            document.getElementById("dynamicContent").innerHTML = infoContent[section] || "<h2>Section Not Found</h2>";
+        }
+
+        // Search event and display results
+        function searchEvent() {
+            let input = document.getElementById("searchEvent").value.toLowerCase();
+            let items = document.querySelectorAll("#eventList li");
+            let found = false;
+
+            items.forEach(item => {
+                let eventName = item.innerText.toLowerCase();
+                if (eventName.includes(input)) {
+                    item.style.display = "block";
+                    found = true;
+                } else {
+                    item.style.display = "none";
+                }
+            });
+
+            // If event is found, display details
+            let matchedEvent = Object.keys(eventDetailsData).find(event => event.toLowerCase().includes(input));
+            if (matchedEvent) {
+                displayEventDetails(matchedEvent);
+            }
+        }
+
+        // Filter events by category
+        function filterEvents() {
+            let category = document.getElementById("categoryFilter").value;
+            let items = document.querySelectorAll("#eventList li");
+
+            items.forEach(item => {
+                let eventCategory = item.getAttribute("data-category");
+                if (category === "all" || eventCategory === category) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            });
+        }
+
+        // Display event details dynamically
+        function displayEventDetails(eventName) {
+            let eventData = eventDetailsData[eventName];
+            let eventBox = document.getElementById("eventDetails");
+            let registrationForm = document.getElementById("eventRegistrationForm");
+
+            if (eventData) {
+                let galleryHTML = eventData.images.map(img => `<img src="${img}" alt="${eventName}">`).join("");
+                eventBox.innerHTML = `${eventData.details}<div class="event-gallery">${galleryHTML}</div>`;
+                eventBox.style.display = "block";
+
+                // Show the event-specific registration form
+                registrationForm.style.display = "block";
+                document.getElementById("eventName").innerText = eventName;
+
+                // Clear any existing countdown interval
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+
+                // Start the countdown timer
+                updateCountdown(eventData.date);
+                countdownInterval = setInterval(() => updateCountdown(eventData.date), 1000);
+            } else {
+                eventBox.innerHTML = "No details available.";
+                eventBox.style.display = "block";
+                registrationForm.style.display = "none"; // Hide the form if no event is selected
+            }
+        }
+
+        // Countdown timer for the event
+        function updateCountdown(eventDate) {
+            const nextEventDate = new Date(eventDate);
+            const now = new Date();
+            const diff = nextEventDate - now;
+
+            const countdownElement = document.getElementById("countdown");
+
+            if (diff <= 0) {
+                // Event is over
+                countdownElement.innerHTML = "Event Completed";
+                clearInterval(countdownInterval); // Stop the interval
+            } else {
+                // Calculate days, hours, minutes, and seconds
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                // Display the countdown
+                countdownElement.innerHTML = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }
+
+        // Event registration
+        function registerForEvent() {
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+
+            if (name && email) {
+                alert(`Thank you, ${name}! You have successfully registered for the event.`);
+            } else {
+                alert("Please fill in all fields.");
+            }
+        }
+    </script>
+</body>
+</html>
